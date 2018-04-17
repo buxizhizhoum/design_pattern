@@ -4,6 +4,7 @@
 import curses
 import random
 import time
+import sys
 
 
 HEIGHT = 20
@@ -28,17 +29,25 @@ win.border(0)
 curses.start_color()
 
 
-def add_food(win, x=None, y=None):
+def add_food(win, snake=None, x=None, y=None):
     x = random.randint(1, WIDTH-2) if x is None else x
     y = random.randint(1, HEIGHT-2) if y is None else y
-    # todo: not on snake
+    # ensure food do not generate on snake
+    while on_snake_chk((x, y), snake) is True:
+        x = random.randint(1, WIDTH - 2) if x is None else x
+        y = random.randint(1, HEIGHT - 2) if y is None else y
+
     win.addch(y, x, ch_food)
     win.refresh()
 
-    global flag_food
-    flag_food = True
-
     return x, y
+
+
+def on_snake_chk(food_coordinate, snake):
+    if food_coordinate in snake:
+        return True
+    else:
+        return False
 
 
 def move_snake(snake, direction, food_coordinate):
@@ -106,8 +115,7 @@ def get_input(win):
     elif input == ord("d"):
         direction = "right"
     elif input == ord('q'):
-        direction = None
-        # pass
+        sys.exit(0)
     else:
         direction = None
         # pass
@@ -120,10 +128,9 @@ flag_food = False
 while True:
     # display_initial_snake(snake)
     if flag_food is False:
-        food_xy = add_food(win)
-    else:
-        # in case there is no food_xy coordinate
-        food_xy = (2, 2)
+        food_xy = add_food(win, snake=snake)
+
+        flag_food = True
 
     time.sleep(0.3)
     direction_input = get_input(win)
