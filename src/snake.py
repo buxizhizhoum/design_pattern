@@ -9,10 +9,10 @@ import sys
 
 HEIGHT = 20
 WIDTH = 50
-SIDE_LENGTH = 3
+SPEED = 3  # speed, the larger the faster
+INTERVAL = 1.0 / SPEED
 
-
-snake = [(1, 2)]
+snake = [(random.randint(1, WIDTH-2), random.randint(1, HEIGHT-2))]
 
 
 ch_snake, ch_head, ch_board, ch_food = "X", "X", "#", "@"
@@ -27,6 +27,13 @@ win.border(0)
 win.nodelay(1)
 win.border(0)
 curses.start_color()
+
+win.addch(0, 0, "l")
+win.refresh()
+win.addch(0, WIDTH-1, "r")
+# win.addch(HEIGHT-1, WIDTH-1, "b")
+win.addch(HEIGHT-1, 0, "1")
+win.refresh()
 
 
 def add_food(win, snake=None, x=None, y=None):
@@ -82,8 +89,12 @@ def move_snake(snake, direction, food_coordinate, width, height):
         # raise SystemExit
         # sys.exit(0)
         # print("Game Over")
-        win.addstr(9, 20, "Game Over!")
+        win.addstr(10, 20, "Game Over!")
         win.refresh()
+
+        global game_over
+        game_over = True
+
         return
 
     snake.insert(0, snake_tmp)
@@ -159,29 +170,33 @@ def reset():
     y = random.randint(1, HEIGHT - 2)
     global snake
     snake = [(x, y)]
+
+    global game_over
+    game_over = False
+
     # erase all content
     clear(win, WIDTH, HEIGHT)
 
 
-direction = "right"
-flag_food = False
-while True:
-    # display_initial_snake(snake)
-    if flag_food is False:
-        food_xy = add_food(win, snake=snake)
+if __name__ == "__main__":
 
-        flag_food = True
+    direction = "right"
+    flag_food = False
+    game_over = False
+    while True:
+        # display_initial_snake(snake)
+        if flag_food is False:
+            food_xy = add_food(win, snake=snake)
+            flag_food = True
 
-    time.sleep(0.3)
-    direction_input = get_input(win)
+        direction_input = get_input(win)
 
-    if direction_input is not None:
-        direction = direction_input
+        if game_over is False:
+            if direction_input is not None:
+                direction = direction_input
 
-    # win.addstr(20, 10, direction)
-    # win.refresh()
-    # print direction
+            move_snake(snake, direction, food_xy, WIDTH, HEIGHT)
 
-    move_snake(snake, direction, food_xy, WIDTH, HEIGHT)
+        time.sleep(INTERVAL)
 
 
