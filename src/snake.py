@@ -50,7 +50,16 @@ def on_snake_chk(food_coordinate, snake):
         return False
 
 
-def move_snake(snake, direction, food_coordinate):
+def border_chk(point, width, height):
+    x, y = point
+    if x == 0 or y == 0 or x == width - 1 or y == height - 1:
+        # on border
+        return True
+    else:
+        return False
+
+
+def move_snake(snake, direction, food_coordinate, width, height):
     snake_head = snake[0]
     snake_tail = snake[-1]
 
@@ -68,6 +77,14 @@ def move_snake(snake, direction, food_coordinate):
 
     else:
         raise ValueError("wrong direction.")
+
+    if border_chk(snake_tmp, width, height):
+        # raise SystemExit
+        # sys.exit(0)
+        # print("Game Over")
+        win.addstr(9, 20, "Game Over!")
+        win.refresh()
+        return
 
     snake.insert(0, snake_tmp)
 
@@ -116,11 +133,34 @@ def get_input(win):
         direction = "right"
     elif input == ord('q'):
         sys.exit(0)
+    # reset
+    elif input == ord('r'):
+        # reset
+        reset()
+        return
     else:
         direction = None
         # pass
 
     return direction
+
+
+def clear(win, width, height):
+    for i in range(1, width-1):
+        for j in range(1, height-1):
+            win.addch(j, i, " ")
+            win.refresh()
+
+
+def reset():
+    global flag_food
+    flag_food = False
+    x = random.randint(1, WIDTH - 2)
+    y = random.randint(1, HEIGHT - 2)
+    global snake
+    snake = [(x, y)]
+    # erase all content
+    clear(win, WIDTH, HEIGHT)
 
 
 direction = "right"
@@ -142,6 +182,6 @@ while True:
     # win.refresh()
     # print direction
 
-    move_snake(snake, direction, food_xy)
+    move_snake(snake, direction, food_xy, WIDTH, HEIGHT)
 
 
