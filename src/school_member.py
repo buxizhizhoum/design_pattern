@@ -97,6 +97,16 @@ class WorkerFactory(Factory):
         return Worker()
 
 
+class AbstractFactory(object):
+    def __init__(self, prod_type):
+        self.prod_type = prod_type
+
+    def factory(self):
+        if self.prod_type.lower() == "teacher":
+            return TeacherFactory()
+        elif self.prod_type.lower() == "student":
+            return StudentFactory()
+
 if __name__ == "__main__":
     teacher_factory = TeacherFactory()
     student_factory = StudentFactory()
@@ -116,4 +126,7 @@ if __name__ == "__main__":
     worker = worker_factory.produce()
     worker.info()
 
+    # abstract factory?
+    factory = AbstractFactory("teacher").factory()
+    factory.produce()
 
